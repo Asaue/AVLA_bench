@@ -1,0 +1,8 @@
+*.gif
+*.ipynb
+*.sh
+*.txt
+*.json
+*.pyc
+piper_description_old/
+piper_description_new/

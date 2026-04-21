@@ -1,0 +1,62 @@
+{
+"google_robot_move_near_vm_0" : {
+        "task_name": "google_robot_move_near",
+        "robot_name": "google_robot_static",
+        "env_name": "MoveNearGoogleBakedTexInScene-v0",           
+        "scene_name": "google_pick_coke_can_1_v4",   
+        "max_episode_steps": 80,    
+        "robot_init_x": [0.35, 0.35, 1],
+        "robot_init_y": [0.21, 0.21, 1],
+        "obj_variation_mode": "episode",
+        "episode_nums": 60,
+        "robot_init_rot_quat_center": [0, 0, 0, 1],
+        "robot_init_rot_rpy_range": [0, 0, 1, 0, 0, 1, -0.09, -0.09, 1],
+        "additional_env_build_kwargs": {},
+        "rgb_overlay_path": "{SIMPLER_DIR}/ManiSkill2_real2sim/data/real_inpainting/google_move_near_real_eval_1.png"
+},
+"google_robot_move_near_vm_1" : {
+        "task_name": "google_robot_move_near",
+        "robot_name": "google_robot_static",
+        "env_name": "MoveNearGoogleBakedTexInScene-v0",           
+        "scene_name": "google_pick_coke_can_1_v4",   
+        "max_episode_steps": 80,    
+        "robot_init_x": [0.35, 0.35, 1],
+        "robot_init_y": [0.21, 0.21, 1],
+        "obj_variation_mode": "episode",
+        "episode_nums": 60,
+        "robot_init_rot_quat_center": [0, 0, 0, 1],
+        "robot_init_rot_rpy_range": [0, 0, 1, 0, 0, 1, -0.09, -0.09, 1],
+        "additional_env_build_kwargs": {"urdf_version":"recolor_tabletop_visual_matching_1"},
+        "rgb_overlay_path": "{SIMPLER_DIR}/ManiSkill2_real2sim/data/real_inpainting/google_move_near_real_eval_1.png"
+},
+"google_robot_move_near_vm_2" : {
+        "task_name": "google_robot_move_near",
+        "robot_name": "google_robot_static",
+        "env_name": "MoveNearGoogleBakedTexInScene-v0",           
+        "scene_name": "google_pick_coke_can_1_v4",   
+        "max_episode_steps": 80,    
+        "robot_init_x": [0.35, 0.35, 1],
+        "robot_init_y": [0.21, 0.21, 1],
+        "obj_variation_mode": "episode",
+        "episode_nums": 60,
+        "robot_init_rot_quat_center": [0, 0, 0, 1],
+        "robot_init_rot_rpy_range": [0, 0, 1, 0, 0, 1, -0.09, -0.09, 1],
+        "additional_env_build_kwargs": {"urdf_version":"recolor_tabletop_visual_matching_2"},
+        "rgb_overlay_path": "{SIMPLER_DIR}/ManiSkill2_real2sim/data/real_inpainting/google_move_near_real_eval_1.png"
+},
+"google_robot_move_near_vm_3" : {
+        "task_name": "google_robot_move_near",
+        "robot_name": "google_robot_static",
+        "env_name": "MoveNearGoogleBakedTexInScene-v0",           
+        "scene_name": "google_pick_coke_can_1_v4",   
+        "max_episode_steps": 80,    
+        "robot_init_x": [0.35, 0.35, 1],
+        "robot_init_y": [0.21, 0.21, 1],
+        "obj_variation_mode": "episode",
+        "episode_nums": 60,
+        "robot_init_rot_quat_center": [0, 0, 0, 1],
+        "robot_init_rot_rpy_range": [0, 0, 1, 0, 0, 1, -0.09, -0.09, 1],
+        "additional_env_build_kwargs": {"urdf_version":"recolor_cabinet_visual_matching_1"},
+        "rgb_overlay_path": "{SIMPLER_DIR}/ManiSkill2_real2sim/data/real_inpainting/google_move_near_real_eval_1.png"
+}
+}
