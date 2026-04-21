@@ -1,4 +1,4 @@
-# 🤖 X-VLA (AVLA Bench)
+# 🤖 AVLA (AVLA Bench)
 本仓库是一个通用的视觉-语言-动作 (VLA) 模型训练、评估与部署框架。现已全面支持自定义 Franka 仿真数据 的快速接入与微调。
 
 ## 🛠️ 1. 环境配置
@@ -26,7 +26,7 @@ accelerate launch \
     --freeze_steps 50 \
     --warmup_steps 100 \
     --save_interval 250 \
-    --output_dir '/Data/Docker_liuwu/models/xvla_check'
+    --output_dir '……/models/xvla_check'
 ```
 
 提示：显存不足时，可使用 peft_train.py 替代 train.py 进行 LoRA 微调。
