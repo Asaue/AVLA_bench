@@ -1,4 +1,4 @@
-name: xvla-stable
+name: xvla-env
 channels:
   - conda-forge
   - pytorch
