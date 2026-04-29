@@ -176,6 +176,17 @@ def update_group_lrs(optim, step, args):
 # Main Training
 # ============================================================
 def main(args):
+
+    # import debugpy
+
+    # # 💡 5678 是默认端口，0.0.0.0 允许你从 VSCode 接入
+    # debugpy.listen(("0.0.0.0", 5678))
+    # print("⏳ [Debug模式] 正在等待 VSCode 调试器接入...")
+
+    # # 💡 这一行会让程序死死卡在这里，直到你在 VSCode 里按下连接按钮它才往下走！
+    # debugpy.wait_for_client()
+    # print("🐛 [Debug模式]")
+
     output_dir = Path(args.output_dir)
     accelerator = Accelerator(
         log_with="tensorboard", 

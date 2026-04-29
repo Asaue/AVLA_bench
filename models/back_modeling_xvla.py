@@ -175,9 +175,7 @@ class XVLA(PreTrainedModel):
             proprio=proprio_m,
             **enc,
         )
-        # return self.action_space.compute_loss(pred_action, action)
-        # 返回所有loss组成以及预测action，实际action
-        return self.action_space.compute_loss(pred_action, action),pred_action,action
+        return self.action_space.compute_loss(pred_action, action)
 
     # ================================= inference =================================
     @torch.no_grad()

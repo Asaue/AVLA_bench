@@ -19,7 +19,7 @@ class FrankaMujocoHandler:
         csv_path = os.path.join(traj_path, "trajectory.csv")
         df = pd.read_csv(csv_path)
 
-        instruction_text = "manipulate the object with the franka arm"
+        instruction_text = "pick up the block and place it on the plate"
 
         states = []
         for _, row in df.iterrows():

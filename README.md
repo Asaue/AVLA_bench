@@ -37,3 +37,7 @@ accelerate launch \
 ```Bash
 python deploy.py --model_path ……/models/xvla_check
 ```
+
+rm -f ./logs/info.json
+python deploy.py     --model_path /Data/Docker_liuwu/models/xvla_check_rec/ckpt-30000     --port 8010     --disable_slurm
+accelerate launch   --num_processes=1   --mixed_precision bf16   peft_train.py   --models '/Data/Docker_liuwu/models/xvla-pt'   --train_metas_path '/Data/Docker_liuwu/X-VLA-main/datasets/recordings_conv'   --batch_size 16   --learning_rate 2e-4   --learning_coef 0.1   --iters 30000   --freeze_steps 0   --warmup_steps 2000   --save_interval 5000   --output_dir '/Data/Docker_liuwu/models/xvla_check_rec'

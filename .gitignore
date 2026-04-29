@@ -3,7 +3,7 @@ envs/
 .vscode
 # 忽略 datasets 目录下所有以 franka 开头的文件夹
 datasets/franka*/
-
+datasets/recordings*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

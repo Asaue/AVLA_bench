@@ -40,6 +40,93 @@ import logging
 import os
 import sys
 
+import requests
+import threading
+import numpy as np
+
+import requests
+import threading
+import numpy as np
+
+import requests
+import base64
+from PIL import Image
+import io
+import time
+import torch
+
+def run_closed_loop_rollout(model, processor, batch_inputs, max_steps=30):
+    print(f"\n🎮 [闭环测试] 暂停训练，开始 {max_steps} 步实机连贯操作...")
+    
+    # 兼容多卡
+    base_model = model.module if hasattr(model, "module") else model
+    base_model.eval()
+
+    # 🚨 1. 瞬间重置仿真环境
+    # try:
+    #     requests.get("http://127.0.0.1:9380/reset", timeout=1.0)
+    #     time.sleep(0.5) 
+    # except Exception as e:
+    #     print(f"⚠️ 无法连接到 MuJoCo 仿真器: {e}，跳过本次测试。")
+    #     base_model.train()
+    #     return
+
+    device = batch_inputs["input_ids"].device
+
+    # =========================================================
+    # 🌟 核心修复：直接从当前合法的 Batch 中“借用”静态上下文数据
+    # 绝对保证 domain_id, proprio, input_ids 的维度和索引百分百合法！
+    # =========================================================
+    safe_input_ids = batch_inputs["input_ids"][0:1]  # 借用合法的文本 Token
+    safe_domain_id = batch_inputs["domain_id"][0:1]  # 借用合法的 domain
+    safe_proprio = batch_inputs["proprio"][0:1]      # 借用合法的 proprio 初始状态
+
+    for step in range(max_steps):
+        try:
+            # --- A. 获取真实的实时图片 ---
+            resp = requests.get("http://127.0.0.1:9380/obs", timeout=1.0).json()
+            img_global_bytes = base64.b64decode(resp["image_global_b64"])
+            img_global = Image.open(io.BytesIO(img_global_bytes)).convert("RGB")
+            
+            # --- B. 仅处理视觉输入 ---
+            # 传一个空文本进去，我们只想要它吐出的 image_input 和 image_mask
+            live_vision = processor([img_global], "dummy text") 
+
+            # --- C. 组装终极混合 Input ---
+            inference_inputs = {
+                "input_ids": safe_input_ids,
+                "image_input": live_vision["image_input"].to(device),
+                "image_mask": live_vision["image_mask"].to(device),
+                "domain_id": safe_domain_id,
+                "proprio": safe_proprio
+            }
+
+            # --- D. 模型推理 ---
+            with torch.no_grad():
+                pred_actions = base_model.generate_actions(**inference_inputs, steps=10)
+            
+            # 切割 10 维并发送
+            raw_20d_action = pred_actions[0, 0].cpu().numpy()
+            action_10d = raw_20d_action[:10].tolist()
+
+            requests.post("http://127.0.0.1:9380/action", json={
+                "action_type": "ee_pos",
+                "data": action_10d,
+                "pred_data": None
+            }, timeout=0.5)
+
+            if step % 5 == 0:
+                print(f"  -> 步骤 {step}/{max_steps} 执行完毕...")
+                
+            time.sleep(0.2) 
+
+        except Exception as e:
+            print(f"⚠️ 测试过程中断: {e}")
+            break
+
+    print("✅ 闭环测试结束，恢复训练！\n")
+    base_model.train()
+
 # ============================================================
 # logger
 # ============================================================
@@ -246,13 +333,41 @@ def main(args):
         update_group_lrs(optim, global_step, args)
 
         # Forward & backward
-        loss_dict: Dict[str, torch.Tensor] = model(**inputs)
+        # loss_dict: Dict[str, torch.Tensor] = model(**inputs)
+        loss_dict, pred_action, action = model(**inputs)
+
+
+        # 每 100 步打印一次预测值、真实值和详细的 loss 组成
+        if global_step > 0 and global_step % 20 == 0:
+            print("pre:++++++++++", pred_action.detach().cpu().numpy())
+            print("action:++++++++++", action.detach().cpu().numpy())
+            
+            # 提取具体的 loss 值，并转化为干净的 Python 浮点数保留 4 位小数
+            p_loss = loss_dict.get("position_loss", 0).item()
+            r_loss = loss_dict.get("rotate6D_loss", 0).item()
+            g_loss = loss_dict.get("gripper_loss", 0).item()
+            total_loss = loss.item()
+            
+            print(f"[Step {global_step}] 📊 Loss Detail => Pos: {p_loss:.4f} | Rot6D: {r_loss:.4f} | Gripper: {g_loss:.4f} | Total: {total_loss:.4f}")
+            print("-" * 60) # 加个分割线，方便在终端里肉眼区分
+
+
         loss = sum(loss_dict.values())
         accelerator.backward(loss)
         if args.max_grad_norm:
             accelerator.clip_grad_norm_(model.parameters(), args.max_grad_norm)
         optim.step()
         optim.zero_grad()
+
+
+        if global_step > 0 and global_step % 100 == 0:
+            run_closed_loop_rollout(
+                model=model, 
+                processor=processor, 
+                batch_inputs=inputs,  # 直接把 inputs 喂进去就行
+                max_steps=30
+            )
+
 
         # Logging
         if global_step % args.log_interval == 0:
@@ -266,7 +381,7 @@ def main(args):
                 t0 = time.time()
                 logger.info(
                     f"[{global_step}/{args.iters}] "
-                    f"loss={logs['loss_total']:.4f} "
+                    f"loss_sum={logs['loss_total']:.4f} "
                     f"lr_core={logs['lr_transformer_core']:.2e} "
                     f"lr_vlm={logs['lr_vlm']:.2e} ({dt:.2f}s/it)"
                 )

@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: 强行接入 X-VLA",
+            "name": "Python: Attach to X-VLA",
             "type": "debugpy",
             "request": "attach",
             "connect": {
@@ -15,8 +15,7 @@
                     "remoteRoot": "/Data/Docker_liuwu/X-VLA-main"
                 }
             ],
-            // 💡 设为 false 让你可以直接跳进 transformer.py 和 modeling_xvla.py 的底层源码！
-            "justMyCode": false 
+            "justMyCode": false
         }
     ]
 }
